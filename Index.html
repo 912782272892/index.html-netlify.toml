@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Generador de videos con IA (Gemini)</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-6">
+  <div class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow-lg">
+    <h1 class="text-2xl font-bold mb-4">🎥 Generador de Videos con IA (Gemini)</h1>
+    <textarea id="idea" rows="4" placeholder="Escribí tu idea de video..." class="w-full p-3 border rounded mb-4"></textarea>
+    <button onclick="generarVideoIA()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Generar</button>
+
+    <div id="resultado" class="mt-6 hidden">
+      <h2 class="text-xl font-bold">📝 Guion generado:</h2>
+      <p id="guion" class="whitespace-pre-line mt-2"></p>
+    </div>
+  </div>
+
+  <script>
+    const API_KEY = "AIzaSyAhI5XYoPvd2FCjn2ag-rPDxBuA_4j5haA";
+
+    async function generarVideoIA() {
+      const idea = document.getElementById("idea").value.trim();
+      if (!idea) return alert("Escribí una idea primero");
+
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateText?key=${API_KEY}`;
+
+      const body = {
+        prompt: {
+          text: `Generá un guion completo para un video de YouTube sobre: ${idea}`
+        },
+        temperature: 0.7,
+        maxOutputTokens: 512,
+        topP: 0.8,
+        topK: 40
+      };
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+
+      const data = await res.json();
+
+      if (data.candidates && data.candidates.length > 0) {
+        const textoGenerado = data.candidates[0].content;
+        document.getElementById("guion").innerText = textoGenerado;
+        document.getElementById("resultado").classList.remove("hidden");
+      } else {
+        document.getElementById("guion").innerText = "No se pudo generar contenido.";
+        document.getElementById("resultado").classList.remove("hidden");
+      }
+    }
+  </script>
+</body>
+</html>
